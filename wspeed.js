@@ -5,9 +5,9 @@ var timer1;
 var speedFactor;
 var lives;
 var livesTotal;
-var typed
 var score;
 var wordsTyped;
+var gameIsRunning;
 
 function setup() {
 	createCanvas(window.innerWidth, window.innerHeight - 4);
@@ -16,88 +16,75 @@ function setup() {
 	as = [];
 	background(0);
 	timer = 1;
-	typed = "";
 	speedFactor = 1;
 	lives = 20 * 9;
 	score = 0;
 	wordsTyped = 0;
 	livesTotal = lives;
 	as.push(new Asteroid());
+	gameIsRunning = true;
 
 }
 
 function draw() {
 
 	background(0);
-	for (var i = 0; i < as.length; i++) {
-		as[i].move();
-		as[i].display();
-	}
-	fill(255, 0, 0);
-	stroke(0);
-	rect(3, 3, width * .4 * (lives / livesTotal), height * .05);
-
-	stroke(0);
-	fill(255);
-	textAlign(LEFT);
-	text("Score:" + floor(score), width - (width * .15), height * .045);
-
-	stroke(0);
-	fill(255);
-	textAlign(RIGHT);
-	text("WPM:" + floor(wordsTyped / (timer / 60)), width - (width * .2), height * .045);
-
-	stroke(0);
-	fill(0);
-	textAlign(LEFT);
-	textSize(height * .045);
-	text("HP", 10, height * .045);
-
-	fill(255);
-	stroke(0);
-	rect(0, height * .95, width * .4, height);
-
-
-	stroke(255);
-	fill(0);
-	textSize(height * .05);
-	textAlign(LEFT);
-	text(typed, 5, height - 2);
-	if (timer % 12 == 0) {
-		as.push(new Asteroid());
-		timer++;
-	}
-	if (frameCount % 60 == 0) {
-		timer++;
-	}
-	if (lives <= 0)
-		setup();
-	speedFactor += .00001;
-
-}
-
-function keyPressed() {
-
-	if (key >= 'a' && key <= 'z')
-		typed += "" + key;
-	if (keyCode == RETURN) {
-		checkTyped();
-		typed = "";
-	}
-	if (keyCode == BACKSPACE)
-		typed = typed.substring(0, typed.length - 1);
-
-}
-
-function checkTyped() {
-	for (var i = 0; i < as.length; i++)
-		if (typed == as[i].word) {
-			as[i].init();
-			as[i].x = width + 200;
-			score += typed.length * speedFactor;
-			wordsTyped++;
+	if (gameIsRunning) {
+		for (var i = 0; i < as.length; i++) {
+			as[i].move();
+			as[i].display();
 		}
+		fill(255, 0, 0);
+		stroke(0);
+		rect(3, 3, width * .4 * (lives / livesTotal), height * .05);
+
+		stroke(0);
+		fill(255);
+		textAlign(LEFT);
+		text("Score:" + floor(score), width - (width * .15), height * .045);
+
+		stroke(0);
+		fill(255);
+		textAlign(RIGHT);
+		text("WPM:" + floor(wordsTyped / (timer / 60)), width - (width * .2), height * .045);
+
+		stroke(0);
+		fill(0);
+		textAlign(LEFT);
+		textSize(height * .045);
+		text("HP", 10, height * .045);
+
+		if (timer % 12 == 0) {
+			as.push(new Asteroid());
+			timer++;
+		}
+		if (frameCount % 60 == 0) {
+			timer++;
+		}
+		if (lives <= 0)
+			showHighScores(score);
+		speedFactor += .00001;
+	} else {
+		rgbCount += 1;
+		rgb = getRgb(rgbCount)
+	}
 }
+
+document.getElementById("myTextBox").onkeypress = function (event) {
+	console.log(event);
+	if (event.keyCode == 13 || event.which == 13) {
+		var typed = document.getElementById("myTextBox").value
+		console.log(typed)
+		for (var i = 0; i < as.length; i++)
+			if (typed == as[i].word) {
+				as[i].init();
+				as[i].x = width + 200;
+				score += typed.length * speedFactor;
+				wordsTyped++;
+			}
+		document.getElementById('myTextBox').value = "";
+	}
+};
 
 function Asteroid() {
 
